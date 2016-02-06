@@ -85,9 +85,10 @@ public class Collision {
     /**
      * Generic method. We can implement object-specific interactions by enforcing
      * only certain types of objects to be passed in
-     * @param <T>
-     * @param c
-     * @return
+     * 
+     * @param <T> The type that we're checking collision against.
+     * @param c The Collider to check against.
+     * @return Are we colliding?
      * @throws virtualgarden.Collision.ColliderNotPopulatedException 
      */
     public <T extends Collider> boolean isColliding(T c) throws ColliderNotPopulatedException {
