@@ -28,17 +28,24 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- *
- * @author Michael
+ * Our garden. A singleton. Holds our plants and handles 
+ * collection-safe creation and destruction.
+ * 
+ * @author Michael Hawthorne
  */
 public class Garden
 {
-    private static Garden instance;
+    private static Garden instance;             // Our singleton instance
     int width, height;
-    ArrayList<Plant> plants;
-    static ArrayList<Plant> plantsToAdd;
-    static ArrayList<Plant> plantsToDestroy;
+    ArrayList<Plant> plants;                    // Plants currently growing
+    static ArrayList<Plant> plantsToAdd;        // Plants to be added on next cycle
+    static ArrayList<Plant> plantsToDestroy;    // Plants to be destroyed on next cycle
     
+    /**
+     * Returns our Garden instance. Note that Init must be called before this.
+     * 
+     * @return Garden instance
+     */
     public static Garden getInstance() {
         if (instance == null) {
             throw new RuntimeException("Must instantiate garden first with Init method");
@@ -46,19 +53,39 @@ public class Garden
         return instance;
     }
     
+    /**
+     * Initializes our garden.
+     * 
+     * @param width Visual width.
+     * @param height Visual height.
+     * @param seeds Number of seeds to start with.
+     */
     public static void Init(int width, int height, int seeds) {
         instance = new Garden(width, height, seeds);
-        plantsToAdd = new ArrayList<Plant>();
-        plantsToDestroy = new ArrayList<Plant>();
     }
     
+    /**
+     * Garden ctor.
+     * 
+     * @param width Visual width.
+     * @param height Visual height.
+     * @param seeds Number of seeds to start with.
+     */
     private Garden(int width, int height, int seeds)
     {
         this.width = width;
         this.height = height;
+        plantsToAdd = new ArrayList<Plant>();
+        plantsToDestroy = new ArrayList<Plant>();
         plantNewSeeds(seeds);
     }
     
+    /**
+     * A single cycle of our garden. Instructs plants to grow, and handles
+     * creating/destroying plants afterward.
+     * 
+     * @param amt Time factor for growing.
+     */
     public void grow(float amt) {
         for (Plant p : plants) {
             p.grow(amt);
@@ -74,11 +101,24 @@ public class Garden
         plantsToDestroy.clear();
     }
     
+    /**
+     * Notify garden to destroy plant at end of grow cycle. This is to make our
+     * collections safe while we're iterating through the plants during the
+     * grow phase.
+     * 
+     * @param p  The plant to destroy
+     */
     public void notifyDeath(Plant p) {
         plantsToDestroy.add(p);
     }
     
+    /**
+     * Draws our plants.
+     * 
+     * @param g Graphics object
+     */
     public void draw(Graphics g) {
+        // Drawer allows us to draw our plants based on a depth value
         Drawer d = Drawer.getInstance();
         for (Plant p : plants) {
             p.addToDrawer(d);
@@ -86,16 +126,32 @@ public class Garden
         d.draw(g);
     }
     
+    /**
+     * Clears the garden and plants all new seeds.
+     * 
+     * @param numSeeds The number of seeds.
+     */
     private void plantNewSeeds(int numSeeds) {
         Random r = new Random();
         plants = new ArrayList<Plant>();
         for (int i = 0; i < numSeeds; i++) {
             Plant newPlant = new Plant(r.nextInt(width), r.nextInt(height), 
                     Plant.Chromosomes.generate());
-            plants.add(newPlant);
+            plantsToAdd.add(newPlant);
         }
     }
     
+    /**
+     * Plants a set of seeds around the parent.
+     * 
+     * If the seeds are planted outside the boundaries of the garden, they are
+     * ignored/destroyed.
+     * 
+     * @param seeds A set of seeds to plant, determined from mating the parents.
+     * @param x X position of parent.
+     * @param y Y position of parent.
+     * @param spread How wide the parent can spread seeds.
+     */
     public void plantSeedsFromReproduction(ArrayList<Plant.Chromosomes> seeds, int x, int y, int spread) {
         Random r = new Random();
         
@@ -108,10 +164,14 @@ public class Garden
             
             if (newX > 0 && newX < width && newY > 0 && newY < height)
                 plantsToAdd.add(new Plant(newX, newY, seed));
-        }
-        
+        } 
     }
     
+    /**
+     * Get a random mate from the garden.
+     * 
+     * @return A random plant from the garden.
+     */
     public Plant getRandomMate() {
         Random r = new Random();
         return plants.get(r.nextInt(plants.size()));

@@ -27,14 +27,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
- * @author Michael
- * @param <T>
+ * Singleton class that handles registering objects that can collide with each
+ * other. Only objects of a similar type may collide with each other. This would
+ * not work for a video game, but it exactly what I'd like for this application.
+ * 
+ * @author Michael Hawthorne
  */
 public class Collision {
-    private static Collision instance;
-    private HashMap<Class, ArrayList<Collider>> colliders;
+    private static Collision instance;              // Dam son, a singleton.
+    private HashMap<Class, ArrayList<Collider>> colliders; // List of colliders.
     
+    /**
+     * Get our Collision instance.
+     * @return Collision instance.
+     */
     public static Collision getInstance() {
         if (instance == null) {
             instance = new Collision();
@@ -42,10 +48,18 @@ public class Collision {
         return instance;
     }
     
+    /**
+     * Collision ctor.
+     */
     private Collision() {
         colliders = new HashMap<Class, ArrayList<Collider>>();
     }
     
+    /**
+     * Register a new object with the Collision object.
+     * 
+     * @param c Collider to register.
+     */
     public void register(Collider c) {
         ArrayList<Collider> colliderList;
         if (!colliders.containsKey(c.getClass())) {
@@ -57,6 +71,11 @@ public class Collision {
         colliders.put(c.getClass(), colliderList);
     }
     
+    /**
+     * Remove an object from the Collision object.
+     * 
+     * @param c The Collider to remove.
+     */
     public void remove(Collider c) {
         ArrayList<Collider> cList = colliders.get(c.getClass());
         cList.remove(c);
@@ -86,7 +105,25 @@ public class Collision {
         return false;
     }
     
+    /**
+     * Specialized Exception for when we try to check if something is colliding
+     * with an uninitialized list.
+     */
     public static class ColliderNotPopulatedException extends Exception {
         
+    }
+    
+    /**
+     * Defines a Collider object.
+     * @param <T> Should be the same as the object implementing this.
+     */
+    public interface Collider<T> {
+        
+        /**
+         * Is this object colliding?
+         * @param other The object to check against.
+         * @return Are we colliding?
+         */
+        public abstract boolean isColliding(T other);
     }
 }

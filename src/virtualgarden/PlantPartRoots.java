@@ -25,20 +25,26 @@ package virtualgarden;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.lang.invoke.MethodHandle;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
- *
- * @author Michael
+ * The Roots of our plant. Mainly produces energy.
+ * 
+ * @author Michael Hawthorne
  */
-public class PlantPartRoots extends PlantPart implements Collider<PlantPartRoots> { 
+public class PlantPartRoots extends PlantPart 
+        implements Collision.Collider<PlantPartRoots>, Drawer.Drawable { 
     int depth;
     int width;
     float width_factor;
-    boolean collided;
+    boolean collided;       // We stop growing when we collide with other roots.
     
+    /**
+     * Initialize a new PlantPartRoots.
+     * 
+     * @param parent_x Parent's X position.
+     * @param parent_y Parent's Y position.
+     * @param chromosome Chromosomes of these roots.
+     */
     public PlantPartRoots(int parent_x, int parent_y, Long chromosome) {
         super(parent_x, parent_y, chromosome);
         depth = (int)(chromosome >> 60) & 0xF;
@@ -46,12 +52,12 @@ public class PlantPartRoots extends PlantPart implements Collider<PlantPartRoots
         collided = false;
     }
 
-    @Override
-    protected ArrayList<Gene> getGenes() {
-        ArrayList<Gene> genes = new ArrayList<Gene>();
-        return genes;
-    }
-
+    /**
+     * Execute a grow cycle. Handles collision.
+     * 
+     * @param amt Amount to grow
+     * @param parent Parent of roots.
+     */
     @Override
     protected void grow( float amt, Plant parent) {
         super.grow(amt, parent);
@@ -60,7 +66,7 @@ public class PlantPartRoots extends PlantPart implements Collider<PlantPartRoots
             // Collision code
             Collision collision = Collision.getInstance();
             try {
-                if ( collision.isColliding((Collider) this)) {
+                if ( collision.isColliding((Collision.Collider) this)) {
                     collided = true;
                 }
             }
@@ -70,8 +76,13 @@ public class PlantPartRoots extends PlantPart implements Collider<PlantPartRoots
         }
     }
 
+    /**
+     * Draw the roots.
+     * 
+     * @param g Graphics object.
+     */
     @Override
-    protected void draw(Graphics g) {
+    public void draw(Graphics g) {
         float depthScale = 1 - ((float)depth / 16f);
         Color c = new Color((int)(128 * depthScale), (int)(93 * depthScale), (int)(18 * depthScale));
         g.setColor(c);
@@ -80,20 +91,40 @@ public class PlantPartRoots extends PlantPart implements Collider<PlantPartRoots
                    (int)getRadius() * 2, (int)getRadius() * 2);
     }
 
+    /**
+     * Calculate consumed energy.
+     * 
+     * @return Energy consumed.
+     */
     @Override
     protected float consumeEnergy() {
         return depth * width * age;
     }
 
+    /**
+     * Calculate produced energy.
+     * @return Energy produced.
+     */
     @Override
     protected float produceEnergy() {
         return depth * getRadius();
     }
     
+    /**
+     * Get the radius of the roots.
+     * 
+     * @return Radius of the roots.
+     */
     public float getRadius() {
         return width_factor * width / 2;
     }
     
+    /**
+     * Collision detection function.
+     * 
+     * @param other Other Roots to collide with.
+     * @return Whether or not we are colliding.
+     */
     @Override
     public boolean isColliding(PlantPartRoots other) {
         float distance = (float)Math.sqrt(Math.pow(parent_x - other.getParentX(), 2) + 

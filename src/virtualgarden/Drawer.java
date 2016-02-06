@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Michael.
+ * Copyright 2016 Michael Hawthorne.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * We need a priority based drawing system. This is a class to solve that.
+ * We need a priority based drawing system. This is a class to solve that. It
+ * is a singleton.
  * 
- * @author Michael
+ * @author Michael Hawthorne
  */
 public class Drawer {
-    private static Drawer instance;                 // We got a singleton on our hands
-    HashMap<Integer, ArrayList<PlantPart>> parts;
+    private static Drawer instance;           // We got a singleton on our hands
+    HashMap<Integer, ArrayList<Drawable>> parts;
     
+    /**
+     * Get the Drawer instance.
+     * 
+     * @return The Drawer instance.
+     */
     public static Drawer getInstance() {
         if (instance == null) {
             instance = new Drawer();
@@ -43,33 +49,57 @@ public class Drawer {
         return instance;
     }
     
+    /**
+     * Initialize a new Drawer.
+     */
     private Drawer() {
-        parts = new HashMap<Integer, ArrayList<PlantPart>>();
+        parts = new HashMap<Integer, ArrayList<Drawable>>();
     }
     
-    public void addToDrawList(PlantPart pp, int priority) {
-        ArrayList<PlantPart> partsList;
+    /**
+     * Add a Drawable to the draw list, with an attached priority.
+     * 
+     * @param d Drawable to add
+     * @param priority  Priority to draw it all. Lower = further in the back.
+     */
+    public void addToDrawList(Drawable d, int priority) {
+        ArrayList<Drawable> partsList;
         if (!parts.containsKey(priority)) {
-            partsList =  new ArrayList<PlantPart>();
+            partsList =  new ArrayList<Drawable>();
         } else {
             partsList = parts.get(priority);
         }
-        partsList.add(pp);
+        partsList.add(d);
         parts.put(priority, partsList);
     }
     
+    /**
+     * Draw our Drawables in  priority order.
+     * @param g 
+     */
     public void draw(Graphics g) {
         int adding = 0;
         for (int i = 0; i < parts.size(); i++) {
             while (!parts.containsKey(i+adding)) {
                 adding++;
             }
-            ArrayList<PlantPart> partsList = parts.get(i+adding);
-            for (PlantPart part : partsList) {
+            ArrayList<Drawable> partsList = parts.get(i+adding);
+            for (Drawable part : partsList) {
                 part.draw(g);
             }
         }
-        parts = new HashMap<Integer, ArrayList<PlantPart>>();
+        parts = new HashMap<Integer, ArrayList<Drawable>>();
         System.gc();
+    }
+    
+    /**
+     * Interface for defining an object that can be drawn by the Drawer.
+     */
+    public interface Drawable {
+        /**
+         * Draw the object.
+         * @param g 
+         */
+        public abstract void draw(Graphics g);
     }
 }

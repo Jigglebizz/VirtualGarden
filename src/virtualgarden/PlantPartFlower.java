@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Michael.
+ * Copyright 2016 Michael Hawthorne.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,11 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 /**
- *
- * @author Michael
+ * The Flower part of our plant. Defines reproduction.
+ * 
+ * @author Michael Hawthorne
  */
-public class PlantPartFlower extends PlantPart {
+public class PlantPartFlower extends PlantPart implements Drawer.Drawable {
     private final float hue;          // Hue of the flower from 0-1
     private final int seed_size;      // Size of seeds
     private final int seed_num;       // Number of seeds
@@ -43,8 +44,15 @@ public class PlantPartFlower extends PlantPart {
     private float flower_age;
     private int calculated_petal_size;
     
-    private boolean spooged;
+    private boolean spooged;    // Have we spooged?
     
+    /**
+     * Creates a new Flower. Interprets chromosome and sets up properties.
+     * 
+     * @param x Parent X position.
+     * @param y Parent Y position.
+     * @param chromosome Chromosome that defines flower.
+     */
     public PlantPartFlower(int x, int y, Long chromosome) {
         super(x, y, chromosome);
         hue = ((int)(chromosome >> 56) & 0xFF) / 256f;
@@ -61,6 +69,12 @@ public class PlantPartFlower extends PlantPart {
         spooged = false;
     }
     
+    /**
+     * Generate a new set of seeds.
+     * 
+     * @param g The Garden. We need this to find a mate.
+     * @param parent The parent plant. We need our full set of Chromosomes.
+     */
     public void generateSeeds(Garden g, Plant parent) {
         Plant mate = g.getRandomMate();
         
@@ -73,6 +87,15 @@ public class PlantPartFlower extends PlantPart {
         g.plantSeedsFromReproduction(seeds, parent_x, parent_y, seed_dispersal * 56);
     }
     
+    /**
+     * Execute a grow cycle. Flowers grow at a constant rate until they reach 
+     * the 'decline_age,' which is defined in our genes. At this point they
+     * spread seeds, and start shrinking. When the flower is twice the decline_age
+     * it dies. For now, the whole plant dies.
+     * 
+     * @param amt Amount to grow.
+     * @param parent Parent plant.
+     */
     @Override
     protected void grow(float amt, Plant parent) {
         super.grow(amt, parent);
@@ -94,19 +117,22 @@ public class PlantPartFlower extends PlantPart {
         }
     }
 
+    /**
+     * Draw the flower.
+     * @param g Graphics Object.
+     */
     @Override
-    protected ArrayList<Gene> getGenes() {
-        ArrayList<Gene> genes = new ArrayList<Gene>();
-        return genes;
-    }
-
-    @Override
-    protected void draw(Graphics g) {
+    public void draw(Graphics g) {
         for (int i = 0; i < num_petals; i++) {
             drawPetal(g, i);
         }
     }
     
+    /**
+     * Draws a single petal of the flower.
+     * @param g Graphics object.
+     * @param i Which petal.
+     */
     private void drawPetal(Graphics g, int i) {
         double angle = ((float)i / (float)num_petals) * 2 * Math.PI;
         double petal_angle = (2 * Math.PI) / (num_petals * 0.9f);
@@ -128,11 +154,21 @@ public class PlantPartFlower extends PlantPart {
         g.drawPolyline(xPoints, yPoints, 3);
     }
 
+    /**
+     * Calculate consumed energy.
+     * 
+     * @return Energy consumed.
+     */
     @Override
     protected float consumeEnergy() {
-        return seed_size * seed_num * seed_dispersal;
+        return (seed_num / petal_size) * 
+               (seed_dispersal / num_petals) * Math.min(flower_age, 1);
     }
-
+    
+    /**
+     * Calculate produced energy.
+     * @return Energy produced.
+     */
     @Override
     protected float produceEnergy() {
         return 0f;

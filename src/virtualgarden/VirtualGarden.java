@@ -25,15 +25,12 @@ package virtualgarden;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.Timer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * This is a virtual garden. It is an automata, responding to 
- * resource inputs from the user.
+ * This is a virtual garden. It is an automata and a visual representation
+ * of genetic algorithms at work
  * 
  * @author Michael Hawthorne
  */
@@ -43,6 +40,7 @@ public class VirtualGarden {
     static Garden garden;
     
     /**
+     * Main function
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -66,22 +64,26 @@ public class VirtualGarden {
                         }
                     }
                 }).start();
-        /*
-        Timer t;
-        t = new Timer(5, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                
-            }
-        });
-        t.start(); */
     }
     
+    /**
+     * Some Java JPanel stuff. 
+     * I don't really want to think too hard about Swing.
+     */
     private static class DrawPanel extends JPanel {
+        
+        /**
+         * ctor
+         */
         public DrawPanel() {
             super();
             setBackground(new Color(54, 19, 8));
         }
         
+        /**
+         * Draws our garden
+         * @param g 
+         */
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
