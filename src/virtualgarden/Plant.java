@@ -59,6 +59,15 @@ public class Plant extends PlantPart implements Drawer.Drawable {
         
         flowers = new ArrayList<PlantPartFlower>();
         flowers.add(new PlantPartFlower(x, y, chromosomes.flower));
+        
+        try {
+            if (c.isColliding(roots)) {
+                die();
+            }
+        } catch (Collision.ColliderNotPopulatedException e) {
+            System.err.println("You forgot to populate the collider\n"
+                               + e.toString());
+        }
     }
     
     /**

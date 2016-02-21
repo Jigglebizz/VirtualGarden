@@ -87,7 +87,9 @@ public class VirtualGarden {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            garden.draw(g);
+            if (garden != null) {
+                garden.draw(g);
+            }
         }
     }
 }

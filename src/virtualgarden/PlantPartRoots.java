@@ -71,7 +71,8 @@ public class PlantPartRoots extends PlantPart
                 }
             }
             catch (Collision.ColliderNotPopulatedException e) {
-                System.err.println("You forgot to populate the collider");
+                System.err.println("You forgot to populate the collider\n"
+                                    + e.toString());
             }
         }
     }
@@ -98,7 +99,7 @@ public class PlantPartRoots extends PlantPart
      */
     @Override
     protected float consumeEnergy() {
-        return depth * width * age;
+        return 0;
     }
 
     /**
