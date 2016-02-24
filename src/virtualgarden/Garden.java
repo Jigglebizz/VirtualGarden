@@ -159,8 +159,8 @@ public class Garden
             int angle = (int)(r.nextFloat() * 2 * Math.PI);
             int distance = (int)(r.nextFloat() * spread);
 
-            int newX = x + (int)(distance * Math.cos(distance));
-            int newY = y + (int)(distance * Math.sin(distance));
+            int newX = x + (int)(distance * Math.cos(angle));
+            int newY = y + (int)(distance * Math.sin(angle));
             
             if (newX > 0 && newX < width && newY > 0 && newY < height)
                 plantsToAdd.add(new Plant(newX, newY, seed));

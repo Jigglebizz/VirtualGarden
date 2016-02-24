@@ -64,6 +64,8 @@ public class PlantPartFlower extends PlantPart implements Drawer.Drawable {
         petal_size = 10 + (((int)(chromosome >> 38) & 0xF) * 2);
         decline_age = 0.5f + 3f * ((int)((chromosome >> 35) & 0x7) / 7f);
         
+        //System.out.println(hue);
+        
         flower_age = 0;
         calculated_petal_size = 0;
         spooged = false;
